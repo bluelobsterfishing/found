@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Found Fishing Gear</title>
+<link rel="icon" href="https://bluelobsterfishing.co.uk/wp-content/uploads/2023/10/cropped-favicon-192x192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+<!--
+  Lost property page for buoys tagged by the Buoy Tracker app.
+
+  The tag holds ONE web link with the details after the "#", e.g.
+    https://bluelobsterfishing.co.uk/f/#B001*Morning+Star*PD417*name@example.com*Reward+if+returned
+  Fields, in order: float no., boat name, registration no., contact, comments.
+  '*' separates fields, '+' is a space, anything else unusual is %-encoded.
+
+  Everything after "#" stays in the finder's browser: browsers never send it
+  to the web server, so the details are not logged or stored anywhere, and
+  this page sends nothing (no forms, no analytics, no cookies).
+  Tag text is untrusted: it is only ever shown with textContent.
+-->
+<style>
+  :root {
+    --navy: #1f2736;
+    --navy-2: #283247;
+    --blue: #009fe4;
+    --yellow: #ffd200;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --text: #1f2736;
+    --muted: #5b6475;
+    --line: #e3e7ee;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Montserrat, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    background: var(--navy);
+    padding: 18px 16px 26px;
+    text-align: center;
+    border-bottom: 5px solid var(--blue);
+  }
+  header img { width: min(260px, 70vw); height: auto; display: block; margin: 0 auto; }
+  main { max-width: 520px; margin: 0 auto; padding: 0 16px 32px; }
+  .intro {
+    background: var(--card);
+    margin: -14px 0 16px;
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    box-shadow: 0 4px 16px rgba(31, 39, 54, .10);
+    text-align: center;
+  }
+  .intro h1 { margin: 0 0 6px; font-size: 1.45rem; font-weight: 800; }
+  .intro p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(31, 39, 54, .10);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .float {
+    background: var(--navy-2);
+    color: #fff;
+    padding: 14px 18px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .float .label { font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; color: #b9c3d6; }
+  .float .value { font-size: 2.2rem; font-weight: 800; color: var(--yellow); letter-spacing: .03em; }
+  dl { margin: 0; padding: 4px 18px 8px; }
+  .row { padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .row:last-child { border-bottom: 0; }
+  dt { font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  dd { margin: 2px 0 0; font-size: 1.2rem; font-weight: 500; overflow-wrap: anywhere; }
+  dd a { color: var(--blue); font-weight: 700; text-decoration: none; }
+  dd a:hover { text-decoration: underline; }
+  .empty { padding: 22px 18px; text-align: center; color: var(--muted); }
+  .buttons { display: grid; gap: 12px; margin-bottom: 18px; }
+  .btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 15px 16px;
+    border-radius: 12px;
+  }
+  .btn small { display: block; font-weight: 500; font-size: .82rem; opacity: .85; margin-top: 2px; }
+  .btn-report { background: var(--yellow); color: var(--navy); }
+  .btn-maker { background: var(--navy); color: #fff; }
+  .btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .privacy {
+    display: flex;
+    gap: 10px;
+    background: #e8f5fd;
+    border: 1px solid #bfe3f8;
+    color: var(--navy);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: .88rem;
+  }
+  .privacy svg { flex: none; margin-top: 2px; }
+  footer { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 18px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="https://bluelobsterfishing.co.uk/wp-content/uploads/2024/01/BLF-New-Logo.jpg"
+       alt="Blue Lobster Fishing – East Coast" width="500" height="303">
+</header>
+
+<main>
+  <section class="intro">
+    <h1>Found fishing gear?</h1>
+    <p>Thank you for scanning. This equipment belongs to the fisherman below. Please help get it back to them.</p>
+  </section>
+
+  <section class="card" id="details" aria-live="polite">
+    <div class="empty">Reading the tag details…</div>
+  </section>
+
+  <div class="buttons">
+    <a class="btn btn-report" id="report" href="https://bluelobsterfishing.co.uk/contact/">
+      Report lost property
+      <small>Let Blue Lobster Fishing know what you found</small>
+    </a>
+    <a class="btn btn-maker" href="https://bluelobsterfishing.co.uk/">
+      Who made this equipment?
+      <small>Visit Blue Lobster Fishing</small>
+    </a>
+  </div>
+
+  <p class="privacy">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+    <span><strong>Your privacy:</strong> no information shown here is stored or used in any way. These details are read from the tag on the equipment and are shown only on your phone; they are never sent to us.</span>
+  </p>
+
+  <footer>Blue Lobster Fishing · East Coast</footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var FIELDS = ["Float", "Boat", "Registration no.", "Contact", "Comments"];
+
+  function decodeField(s) {
+    s = s.replace(/\+/g, " ");
+    try { return decodeURIComponent(s).trim(); } catch (e) { return s.trim(); }
+  }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // A contact line becomes a tap-to-call, email or website link when it
+  // clearly is one; otherwise it is plain text.
+  function contactNode(v) {
+    var a = document.createElement("a");
+    a.textContent = v;
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) {
+      a.href = "mailto:" + encodeURIComponent(v).replace(/%40/g, "@");
+      return a;
+    }
+    if (/^\+?[\d\s()\-]{6,}$/.test(v)) {
+      a.href = "tel:" + v.replace(/[^\d+]/g, "");
+      return a;
+    }
+    var url = /^https?:\/\//i.test(v) ? v :
+              (/^[\w\-]+(\.[\w\-]+)+(\/\S*)?$/.test(v) ? "https://" + v : null);
+    if (url) {
+      a.href = url;
+      a.rel = "noopener noreferrer nofollow";
+      a.target = "_blank";
+      return a;
+    }
+    return document.createTextNode(v);
+  }
+
+  function render() {
+    var box = document.getElementById("details");
+    box.textContent = "";
+    var raw = location.hash.replace(/^#/, "");
+    var vals = raw ? raw.split("*").map(decodeField) : [];
+    while (vals.length < FIELDS.length) vals.push("");
+
+    if (!vals.some(function (v) { return v; })) {
+      box.appendChild(el("div", "empty",
+        "No owner details were found on this tag. Please use “Report lost property” below."));
+      return;
+    }
+
+    if (vals[0]) {
+      var f = el("div", "float");
+      f.appendChild(el("span", "label", "Float"));
+      f.appendChild(el("span", "value", vals[0]));
+      box.appendChild(f);
+      document.title = "Found Float " + vals[0];
+    }
+
+    var dl = el("dl");
+    for (var i = 1; i < FIELDS.length; i++) {
+      if (!vals[i]) continue;
+      var row = el("div", "row");
+      row.appendChild(el("dt", null, FIELDS[i]));
+      var dd = el("dd");
+      dd.appendChild(i === 3 ? contactNode(vals[i]) : document.createTextNode(vals[i]));
+      row.appendChild(dd);
+      dl.appendChild(row);
+    }
+    if (dl.childNodes.length) box.appendChild(dl);
+  }
+
+  render();
+  window.addEventListener("hashchange", render);
+})();
+</script>
+</body>
+</html>
